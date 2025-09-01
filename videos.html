@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Video Manager (Local Storage)</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f4f7f6;
+      color: #333;
+      padding: 2rem;
+      margin: 0;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 2rem;
+    }
+    h2 {
+      margin-top: 0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Layout */
+    .search-container {
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
+    }
+    .action-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .primary-box h2 { color: #4a4a4a; border-bottom: 2px solid #eee; }
+    .primary-box button { background-color: #007bff; }
+    .primary-box button:hover { background-color: #0056b3; }
+
+
+    /* Forms & Buttons */
+    .form-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    /* Search Results */
+    .results-list {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .result-card {
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .result-card p {
+      margin: 0;
+      flex-grow: 1;
+      padding-right: 1rem;
+    }
+    .result-card button {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      background-color: #28a745;
+    }
+    .result-card button:hover {
+      background-color: #218838;
+    }
+
+    /* Saved Videos Section */
+    .video-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .video-item {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .video-item iframe {
+      width: 100%;
+      height: 180px;
+      border: none;
+      border-radius: 4px;
+    }
+    .video-item .platform-badge {
+      font-weight: bold;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      color: white;
+      align-self: flex-start;
+      font-size: 0.8rem;
+    }
+    .platform-youtube { background-color: #ff0000; }
+    .platform-vimeo { background-color: #00adef; }
+
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .button-group button { flex-grow: 1; }
+    .delete-btn { background-color: #d9534f; }
+    .delete-btn:hover { background-color: #c9302c; }
+    .fullscreen-btn { background-color: #5bc0de; }
+    .fullscreen-btn:hover { background-color: #31b0d5; }
+  </style>
+</head>
+<body>
+
+  <h1>Universal Video Manager</h1>
+
+  <div class="search-container">
+    <div class="action-box primary-box">
+      <h2>Add Video by Link or Search YouTube</h2>
+      <div class="form-group">
+        <input type="text" id="universal-input" placeholder="Paste a YouTube/Vimeo link or search..." onkeydown="if(event.key === 'Enter') { event.preventDefault(); handleUniversalInput(); }">
+        <button onclick="handleUniversalInput()">Add / Search</button>
+      </div>
+      <div class="results-list" id="search-results"></div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>🌟 Saved Videos</h2>
+  <div class="video-container" id="video-list"></div>
+
+  <script>
+    // --- CONFIGURATION ---
+    const YOUTUBE_API_KEY = 'AIzaSyAoA6-FpWFCF_vpPREQjxcJ6A7suZlYM-w'; 
+
+    // --- DOM ELEMENT REFERENCES ---
+    const videoList = document.getElementById('video-list');
+    const universalInput = document.getElementById('universal-input');
+    const searchResultsContainer = document.getElementById('search-results');
+
+    // --- LOCAL STATE ---
+    let savedVideos = [];
+
+    // --- HELPER FUNCTIONS ---
+    const getYouTubeVideoId = (url) => url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([0-9A-Za-z_-]{11})/)?. [1] || null;
+    const getVimeoVideoId = (url) => url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/)?.[1] || null;
+
+    // --- LOCAL STORAGE LOGIC ---
+
+    // Load videos from the browser's Local Storage
+    function loadVideosFromStorage() {
+        const storedVideos = localStorage.getItem('universalVideoManager');
+        savedVideos = storedVideos ? JSON.parse(storedVideos) : [];
+    }
+    
+    // Save the current list of videos to Local Storage
+    function saveVideosToStorage() {
+        localStorage.setItem('universalVideoManager', JSON.stringify(savedVideos));
+    }
+
+    // --- CORE APPLICATION LOGIC ---
+
+    // Render the list of video items to the page
+    function renderVideos() {
+      videoList.innerHTML = '';
+      if (savedVideos.length === 0) {
+          videoList.innerHTML = '<p style="text-align:center;">No videos saved yet. Use the form above to add some!</p>';
+          return;
+      }
+      savedVideos.forEach(video => {
+        const url = video.url;
+        const youtubeId = getYouTubeVideoId(url);
+        const vimeoId = getVimeoVideoId(url);
+        const iframeId = `iframe-${video.id}`;
+
+        let platformBadge = '';
+        let iframeSrc = '';
+
+        if (youtubeId) {
+          platformBadge = `<span class="platform-badge platform-youtube">YouTube</span>`;
+          iframeSrc = `https://www.youtube.com/embed/${youtubeId}`;
+        } else if (vimeoId) {
+          platformBadge = `<span class="platform-badge platform-vimeo">Vimeo</span>`;
+          iframeSrc = `https://player.vimeo.com/video/${vimeoId}`;
+        } else {
+          return; // Skip if URL is not recognized
+        }
+
+        const container = document.createElement('div');
+        container.className = 'video-item';
+        container.innerHTML = `
+          ${platformBadge}
+          <iframe id="${iframeId}" src="${iframeSrc}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div class="button-group">
+            <button class="fullscreen-btn" onclick="playFullscreen('${iframeId}')">▶ Play Fullscreen</button>
+            <button class="delete-btn" onclick="deleteVideo('${video.id}')">🗑️ Delete</button>
+          </div>`;
+        videoList.appendChild(container);
+      });
+    }
+
+    // Handles the main input for links or search queries
+    window.handleUniversalInput = async () => {
+        const query = universalInput.value.trim();
+        if (!query) return;
+
+        const isYouTubeLink = getYouTubeVideoId(query);
+        const isVimeoLink = getVimeoVideoId(query);
+
+        if (isYouTubeLink || isVimeoLink) {
+            saveVideo(query);
+        } else {
+            // If it's not a link, perform a YouTube search
+            searchResultsContainer.innerHTML = 'Searching...';
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&maxResults=5&type=video&key=${YOUTUBE_API_KEY}`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error.message);
+
+                searchResultsContainer.innerHTML = ''; // Clear "Searching..."
+                if (data.items.length === 0) {
+                    searchResultsContainer.innerHTML = '<p>No results found.</p>';
+                    return;
+                }
+
+                data.items.forEach(item => {
+                    const videoUrl = `https://www.youtube.com/watch?v=${item.id.videoId}`;
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    card.innerHTML = `<p>${item.snippet.title}</p><button onclick="saveVideo('${videoUrl}')">Embed</button>`;
+                    searchResultsContainer.appendChild(card);
+                });
+            } catch (error) {
+                searchResultsContainer.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+                console.error("YouTube Search Error:", error);
+            }
+        }
+    };
+    
+    // Save a video link to the local array and update storage
+    window.saveVideo = (url) => {
+      const newVideo = {
+        id: crypto.randomUUID(), // Generate a unique ID for the item
+        url: url
+      };
+      savedVideos.unshift(newVideo); // Add new video to the start of the array
+      saveVideosToStorage();
+      
+      universalInput.value = ''; // Clear the input field
+      searchResultsContainer.innerHTML = ''; // Clear search results
+      renderVideos(); // Re-render the list with the new video
+    };
+
+    // Delete a video from the local array and update storage
+    window.deleteVideo = (id) => {
+      if (!confirm('Are you sure you want to delete this video?')) return;
+      savedVideos = savedVideos.filter(video => video.id !== id);
+      saveVideosToStorage();
+      renderVideos();
+    };
+
+    // Make an iframe fullscreen
+    window.playFullscreen = (iframeId) => {
+      const iframe = document.getElementById(iframeId);
+      if (!iframe) return;
+      try {
+        if (iframe.requestFullscreen) iframe.requestFullscreen();
+        else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen(); // Safari
+        else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen(); // Firefox
+        else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen(); // IE/Edge
+      } catch (e) {
+        console.error("Fullscreen failed:", e);
+      }
+    };
+
+    // --- INITIAL PAGE LOAD ---
+    // Load videos from storage and render them when the page first loads
+    document.addEventListener('DOMContentLoaded', () => {
+      loadVideosFromStorage();
+      renderVideos();
+    });
+  </script>
+
+</body>
+</html>
