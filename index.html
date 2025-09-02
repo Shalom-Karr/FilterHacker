@@ -1,148 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SK Video Website</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f4f7f6;
-      color: #333;
-      padding: 2rem;
-      margin: 0;
-    }
-    h1, h2 {
-      text-align: center;
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 2rem;
-    }
-    h2 {
-      margin-top: 0;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Unfilter Protocol</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --primary-color: #58a6ff;
+            --secondary-color: #21262d;
+            --success-color: #2ea043;
+            --danger-color: #f85149;
+        }
 
-    /* Layout */
-    .search-container {
-      max-width: 800px;
-      margin: 0 auto 2rem auto;
-    }
-    .action-box {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    
-    .primary-box h2 { color: #4a4a4a; border-bottom: 2px solid #eee; }
-    .primary-box button { background-color: #007bff; }
-    .primary-box button:hover { background-color: #0056b3; }
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
 
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--secondary-color);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #30363d;
+        }
 
-    /* Forms & Buttons */
-    .form-group {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    input[type="text"] {
-      flex-grow: 1;
-      padding: 0.8rem;
-      font-size: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-    }
-    button {
-      padding: 0.8rem 1.5rem;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      border-radius: 6px;
-      transition: background-color 0.2s ease;
-    }
+        h1, h2 {
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-    /* Search Results */
-    .results-list {
-      max-height: 250px;
-      overflow-y: auto;
-    }
-    .result-card {
-      background: #f9f9f9;
-      padding: 1rem;
-      border-radius: 6px;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .result-card p {
-      margin: 0;
-      flex-grow: 1;
-      padding-right: 1rem;
-    }
-    .result-card button {
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      background-color: #28a745;
-    }
-    .result-card button:hover {
-      background-color: #218838;
-    }
+        p {
+            line-height: 1.6;
+        }
 
-    /* Saved Videos Section */
-    .video-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-    .video-item {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .video-item iframe {
-      width: 100%;
-      height: 180px;
-      border: none;
-      border-radius: 4px;
-    }
-    .video-item .platform-badge {
-      font-weight: bold;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      color: white;
-      align-self: flex-start;
-      font-size: 0.8rem;
-    }
-    .platform-youtube { background-color: #ff0000; }
-    .platform-vimeo { background-color: #00adef; }
+        .form-section {
+            display: block;
+        }
+        
+        .loading-section {
+            display: none;
+        }
 
-    .button-group {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .button-group button { flex-grow: 1; }
-    .delete-btn { background-color: #d9534f; }
-    .delete-btn:hover { background-color: #c9302c; }
-    .fullscreen-btn { background-color: #5bc0de; }
-    .fullscreen-btn:hover { background-color: #31b0d5; }
-  </style>
+        .complete-section {
+            display: none;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        select, button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #484f58;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: #fff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #4da3ff;
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+        }
+
+        .warning {
+            color: var(--danger-color);
+            background-color: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--danger-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            text-align: left;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #484f58;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 20px;
+            height: 25px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: var(--primary-color);
+            transition: width 0.4s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .spinner {
+            border: 4px solid rgba(88, 166, 255, 0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .log-display {
+            background-color: var(--bg-color);
+            border: 1px solid #484f58;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: scroll;
+            text-align: left;
+            font-size: 0.8em;
+            color: #909ba8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .log-display::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-display::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .log-display::-webkit-scrollbar-track {
+            background-color: var(--secondary-color);
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        .illustration-container {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .illustration-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #484f58;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        
+        <div id="form-section" class="form-section">
+            <h2>UNFILTER DEVICE PROTOCOL</h2>
+            <p>Welcome. This tool helps you unfilter your phone, restoring it to full functionality. This protocol is designed to remove proprietary content and restrictions from your device's firmware. This is achieved by securely communicating with the device's bootloader and modifying configuration parameters. Please follow the instructions below to begin the process.</p>
+            
+            <div class="input-group">
+                <label for="phone-select">Select Device Model:</label>
+                <select id="phone-select">
+                    <option value="lg-classic">LG Classic</option>
+                    <option value="lg-exalt">LG Exalt</option>
+                    <option value="kyocera-cadence">Kyocera Cadence</option>
+                    <option value="kyocera-duraxv-lte">Kyocera DuraXV LTE e4610</option>
+                    <option value="kyocera-dura-extreme">Kyocera Dura extreme/Epic</option>
+                    <option value="fig-flip">Fig flip phone</option>
+                    <option value="wonder-phone">Wonder phone</option>
+                    <option value="qin-f21">Qin F21/EKO F30</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="illustration-container">
+                <p><strong>Step 1:</strong> Connect your device via USB.</p>
+                
+            </div>
 
-  <h1>SK Video Website</h1>
+            <button id="start-button">Plug in your phone and press continue</button>
+            
+            <div class="warning">
+                <strong>WARNING:</strong> This process may take 5-10 minutes. Please ensure your device remains connected throughout the entire procedure to prevent data corruption.
+            </div>
+        </div>
 
-  <div class="search-container">
-    <div class="action-box primary-box">
-      <h2>As per the Request of @Dev-in-the-BM This website was taken down Temporarily</h2>
+        <div id="loading-section" class="loading-section">
+            <h2>INITIATING FIRMWARE MODIFICATION</h2>
+            <div class="spinner"></div>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <div id="log-display" class="log-display"></div>
+        </div>
+
+        <div id="complete-section" class="complete-section">
+            <h2 class="success-message">UNFILTERING COMPLETE</h2>
+            <div class="illustration-container">
+                
+            </div>
+            <p><strong>Please restart your phone now.</strong></p>
+            <p>The device's new configuration will be propagated and become active within 48 hours. Thank you for using our service.</p>
+        </div>
+    </div>
+
+    <script>
+        const UNFILTER_DURATION = 150000; // milliseconds
+        
+        const startButton = document.getElementById('start-button');
+        const formSection = document.getElementById('form-section');
+        const loadingSection = document.getElementById('loading-section');
+        const completeSection = document.getElementById('complete-section');
+        const progressBar = document.getElementById('progress-bar');
+        const logDisplay = document.getElementById('log-display');
+
+        const progressMessages = [
+            "Initializing secure connection to device...",
+            "Establishing USB Debug Bridge (ADB)...",
+            "Checking device compatibility and firmware version...",
+            "Parsing bootloader partition table...",
+            "Executing read-only memory integrity checks...",
+            "Bypassing carrier-level restrictions...",
+            "Writing new configuration parameters to firmware...",
+            "Modifying APN settings for unrestricted access...",
+            "Synchronizing data blocks...",
+            "Flushing caches and completing write operations...",
+            "Finalizing device configuration...",
+            "Disconnecting securely from device..."
+        ];
+
+        startButton.addEventListener('click', () => {
+            formSection.style.display = 'none';
+            loadingSection.style.display = 'block';
+            
+            const totalSteps = progressMessages.length;
+            let currentStep = 0;
+            const startTime = Date.now();
+            
+            const updateProgress = () => {
+                const elapsedTime = Date.now() - startTime;
+                const progressPercentage = (elapsedTime / UNFILTER_DURATION) * 100;
+                progressBar.style.width = `${Math.min(progressPercentage, 100)}%`;
+
+                const nextStepIndex = Math.floor(progressPercentage / (100 / totalSteps));
+                if (nextStepIndex > currentStep && currentStep < totalSteps) {
+                    const logMessage = `[${new Date().toLocaleTimeString()}] > ${progressMessages[currentStep]}\n`;
+                    logDisplay.textContent += logMessage;
+                    logDisplay.scrollTop = logDisplay.scrollHeight;
+                    currentStep = nextStepIndex;
+                }
+
+                if (elapsedTime < UNFILTER_DURATION) {
+                    requestAnimationFrame(updateProgress);
+                } else {
+                    setTimeout(() => {
+                        loadingSection.style.display = 'none';
+                        completeSection.style.display = 'block';
+                    }, 1000); // Small delay to make sure progress bar is full
+                }
+            };
+            
+            updateProgress();
+        });
+    </script>
 </body>
 </html>
