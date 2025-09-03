@@ -207,7 +207,7 @@
     </div>
 
     <script>
-        const UNFILTER_DURATION = 240000;
+        const UNFILTER_DURATION = 300000; // Increased duration to 5 minutes for more messages
         const IP_API_URL = 'https://api.ipify.org?format=json';
 
         // Elements
@@ -237,26 +237,69 @@
             document.getElementById('progress-bar-3')
         ];
 
-        // --- REVERTED MESSAGE ARRAY ---
+        // --- MASSIVELY EXPANDED MESSAGE ARRAY ---
         const terminalMessages = [
+            // Phase 1: Initial connection and error check
             { text: "Establishing secure connection...", delay: 0 },
             { text: "Connection established.", delay: 0 },
             { text: "Running exploit on bootloader...", delay: 0 },
+
+            // Phase 2: Device Probing and Validation
             { text: "Validating network identifiers (IMEI & MAC)...", delay: 5000 },
+            { text: "Querying device properties...", delay: 3000 },
+            { text: "Reading SoC identification...", delay: 4000 },
+            { text: "Verifying USB driver stack integrity...", delay: 2000 },
+            { text: "Enumerating ADB device endpoints...", delay: 3000 },
+            { text: "Authenticating with device... RSA key fingerprint accepted.", delay: 4000 },
+            { text: "Requesting elevated privileges via shell...", delay: 6000 },
+            { text: "Checking SELinux status... (Current state: Enforcing)", delay: 2000 },
+
+            // Phase 3: Bootloader and Kernel Exploitation
             { text: "Bootloader vulnerability found on selected device model.", delay: 4000 },
-            { text: "Accessing hidden partition structures...", delay: 10000 },
+            { text: "Acquiring root shell through kernel race condition...", delay: 8000 },
+            { text: "Creating temporary backup of bootloader partition...", delay: 7000 },
+            { text: "Disabling dm-verity and Android Verified Boot...", delay: 9000 },
+            { text: "Injecting payload into initramfs...", delay: 6000 },
+            { text: "Temporarily loading custom permissive SELinux policy...", delay: 5000 },
+            { text: "Patching kernel in-memory to bypass security checks...", delay: 10000 },
+            
+            // Phase 4: Filesystem Analysis
+            { text: "Accessing hidden partition structures...", delay: 5000 },
+            { text: "Remounting /system and /vendor partitions as read/write...", delay: 8000 },
             { text: "Partition map discovered. Scanning for restriction databases...", delay: 9000 },
-            { text: "Restriction database located at /dev/block/by-name/persist/policy_db", delay: 7000 },
+            { text: "Analyzing /system partition filesystem (ext4)...", delay: 4000 },
+            { text: "Performing checksum verification on critical system binaries...", delay: 6000 },
+            { text: "Restriction database located at /dev/block/by-name/persist/policy_db", delay: 2000 },
+            { text: "Backing up original NVRAM values to temporary storage...", delay: 5000 },
+
+            // Phase 5: Bypassing Security and Modifying Framework
             { text: "Bypassing secure boot with custom recovery signature...", delay: 12000 },
+            { text: "Decompiling services.jar for analysis...", delay: 10000 },
+            { text: "Patching ConnectivityService to remove hardcoded restrictions...", delay: 8000 },
+            { text: "Modifying PackageManagerService lockdown policies...", delay: 8000 },
+            { text: "Clearing app restriction lists from Settings Provider database...", delay: 7000 },
+            { text: "Neutralizing device administration enforcement policies...", delay: 6000 },
+            
+            // Phase 6: Network and Connectivity
             { text: "Re-provisioning MAC address for network access...", delay: 8000 },
-            { text: "Injection complete. Overwriting app blacklists and connectivity blocks...", delay: 15000 },
-            { text: "Writing new policy file...", delay: 9000 },
-            { text: "Patching system framework...", delay: 18000 },
-            { text: "Removing hardcoded limitations from system services...", delay: 12000 },
-            { text: "Enabling OTA prevention to block future restriction updates...", delay: 10000 },
-            { text: "Syncing new policy with security manager...", delay: 12000 },
+            { text: "Resetting APN settings to default AOSP configuration...", delay: 5000 },
+            { text: "Unblocking restricted network ports via iptables modification...", delay: 6000 },
+            { text: "Flushing DNS cache and captive portal checks...", delay: 4000 },
+
+            // Phase 7: Injection and Finalization
+            { text: "Injection complete. Overwriting app blacklists and connectivity blocks...", delay: 9000 },
+            { text: "Writing new policy file...", delay: 8000 },
+            { text: "Patching system framework...", delay: 10000 },
+            { text: "Removing hardcoded limitations from system services...", delay: 9000 },
+            { text: "Enabling OTA prevention to block future restriction updates...", delay: 7000 },
+            { text: "Syncing new policy with security manager...", delay: 8000 },
+            
+            // Phase 8: Cleanup
+            { text: "Wiping Dalvik/ART cache to force app recompilation...", delay: 9000 },
             { text: "Cleaning temporary files and logs...", delay: 5000 },
-            { text: "Unfiltering process completed successfully. Finalizing changes.", delay: 8000 },
+            { text: "Removing exploit remnants from /data/local/tmp...", delay: 4000 },
+            { text: "Syncing all filesystem writes to persistent storage...", delay: 7000 },
+            { text: "Preparing device for a clean reboot cycle...", delay: 3000 }
         ];
         
         const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
