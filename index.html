@@ -14,82 +14,33 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
-        /* Custom styles for the terminal effect */
         .terminal {
-            background-color: #0d0d0d;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            color: #00ff00;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
-            resize: vertical;
+            background-color: #0d0d0d; border: 1px solid #333; border-radius: 8px;
+            padding: 1rem; max-height: 400px; overflow-y: auto; white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace; color: #00ff00; font-size: 0.875rem;
+            line-height: 1.25rem; box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); resize: vertical;
         }
-
-        .terminal-line::before {
-            content: '$ ';
-            color: #00ff00;
-        }
-
-        .terminal-message {
-            color: #ddd;
-        }
-
+        .terminal-message { color: #ddd; }
         .progress-bar-container {
-            width: 100%;
-            background-color: #1e293b;
-            border-radius: 9999px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+            width: 100%; background-color: #1e293b; border-radius: 9999px;
+            overflow: hidden; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
         }
-
         .progress-bar {
-            height: 1.5rem;
-            background-color: #00ff00;
-            border-radius: 9999px;
-            transition: width 0.2s ease-out; /* Smoother transition for timer */
-            background-image: linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.15) 25%,
-                transparent 25%,
-                transparent 50%,
-                rgba(255, 255, 255, 0.15) 50%,
-                rgba(255, 255, 255, 0.15) 75%,
-                transparent 75%,
-                transparent
-            );
-            background-size: 1rem 1rem;
-            position: relative;
-            overflow: hidden;
+            height: 1.5rem; background-color: #00ff00; border-radius: 9999px;
+            transition: width 0.2s ease-out;
+            background-image: linear-gradient( 45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%,
+                transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%,
+                transparent 75%, transparent );
+            background-size: 1rem 1rem; position: relative; overflow: hidden;
         }
-        
         .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
+            content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
             background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0) 100%);
             animation: shine 2s infinite;
         }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .spinner {
-            animation: spin 1.5s linear infinite;
-        }
+        @keyframes shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spinner { animation: spin 1.5s linear infinite; }
     </style>
 </head>
 
@@ -97,53 +48,66 @@
     <div id="welcome-screen" class="max-w-xl w-full p-8 bg-slate-800 rounded-2xl shadow-2xl transition-all duration-500 ease-in-out">
         <div class="text-center">
             <h1 class="text-4xl font-bold mb-4 text-emerald-400">RevealOS Unfilter Tool</h1>
-            <p class="text-lg mb-6 text-slate-300">
-                Unlock the full potential of your device. Our tool helps restore full internet access and
-                app functionality to filtered, kosher-certified phones by safely modifying system partitions.
-            </p>
+            <p class="text-lg mb-6 text-slate-300">Unlock the full potential of your device. Our tool helps restore full internet access and app functionality to filtered, kosher-certified phones by safely modifying system partitions.</p>
         </div>
-
-        <!-- Phone Selection -->
         <div class="mb-6">
             <label for="phone-select" class="block text-sm font-medium mb-2 text-slate-400">Select Your Phone Model:</label>
             <select id="phone-select" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                <option value="LG Classic">LG Classic</option>
-                <option value="LG Exalt">LG Exalt</option>
+                <option value="Alcatel Go Flip 3/4">Alcatel Go Flip 3/4</option>
+                <option value="Alcatel Smartflip">Alcatel Smartflip</option>
+                <option value="CAT S22 Flip">CAT S22 Flip</option>
+                <option value="EKO F30">EKO F30</option>
+                <option value="FIG Flip 2">FIG Flip 2</option>
+                <option value="FIG Flip Mini">FIG Flip Mini</option>
+                <option value="Jitterbug Flip2 (Lively Flip)">Jitterbug Flip2 (Lively Flip)</option>
                 <option value="Kyocera Cadence">Kyocera Cadence</option>
                 <option value="Kyocera DuraXV LTE e4610">Kyocera DuraXV LTE e4610</option>
-                <option value="Kyocera Dura extreme/Epic">Kyocera Dura extreme/Epic</option>
-                <option value="Fig flip phone">Fig flip phone</option>
-                <option value="Wonder phone">Wonder phone</option>
+                <option value="Kyocera DuraXV Extreme/Epic">Kyocera DuraXV Extreme/Epic</option>
+                <option value="LG Classic">LG Classic</option>
+                <option value="LG Exalt">LG Exalt</option>
+                <option value="Nokia 2720 V Flip">Nokia 2720 V Flip</option>
+                <option value="Nokia 2780 Flip">Nokia 2780 Flip</option>
+                <option value="Orbic Journey V">Orbic Journey V</option>
                 <option value="Qin F21">Qin F21</option>
-                <option value="EKO F30">EKO F30</option>
-                <option value="TCL">TCL</option>
+                <option value="Sunbeam F1 Orchid/Dandelion">Sunbeam F1 Orchid/Dandelion</option>
+                <option value="TCL Flip/Flip Pro">TCL Flip/Flip Pro</option>
+                <option value="Wonder Phone">Wonder Phone</option>
                 <option value="Other">Other</option>
             </select>
         </div>
-        
         <p class="text-sm text-slate-400 mb-2 text-center">Ensure you have the right cable for your phone and push start:</p>
-        <button id="continue-btn" class="w-full p-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300 transform hover:scale-105">
-            Start
-        </button>
-
-        <div class="mt-6 text-center">
-            <button id="how-it-works-btn" class="text-sm text-slate-500 hover:text-slate-400 transition">
-                How this works
-            </button>
-        </div>
+        <button id="continue-btn" class="w-full p-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300 transform hover:scale-105">Start</button>
+        <div class="mt-6 text-center"><button id="how-it-works-btn" class="text-sm text-slate-500 hover:text-slate-400 transition">How this works</button></div>
     </div>
 
     <!-- Modals -->
     <div id="how-it-works-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
-        <!-- Modal content from previous versions -->
+        <div class="bg-slate-800 p-8 rounded-2xl max-w-2xl w-full shadow-2xl relative">
+            <button id="close-works-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-4 text-emerald-400">How RevealOS™ Works</h2>
+            <div class="text-slate-300 space-y-4 text-sm sm:text-base">
+                <p>Our breakthrough RevealOS™ technology targets the hidden partition structures used by kosher phone manufacturers to restrict functionality. These devices use modified Android builds with deep system-level blocks.</p>
+                <p>When you connect your kosher phone, our system accesses the device through ADB debugging protocols, even when debugging appears disabled. We exploit a bootloader vulnerability that exists in most kosher phone firmware.</p>
+                <h3 class="font-semibold text-slate-200">The process works by:</h3>
+                <ul class="list-decimal list-inside space-y-2">
+                    <li><strong class="text-emerald-300">Partition Discovery</strong> - Maps hidden system partitions containing restriction databases.</li>
+                    <li><strong class="text-emerald-300">Lockdown Bypass</strong> - Injects custom recovery signatures to bypass secure boot.</li>
+                    <li><strong class="text-emerald-300">Restriction Database Modification</strong> - Overwrites app blacklists, browser restrictions, and connectivity blocks.</li>
+                    <li><strong class="text-emerald-300">System Framework Patching</strong> - Removes hardcoded limitations from Android framework.</li>
+                    <li><strong class="text-emerald-300">OTA Prevention</strong> - Blocks future manufacturer updates that would restore restrictions.</li>
+                </ul>
+                <p>The 48-hour window allows the modified system to fully integrate and rebuild its cache files. During this time, restrictions gradually disappear as the phone's security manager rebuilds its policy database with our unrestricted templates.</p>
+                <p>This process is completely reversible and leaves no permanent traces in the device's NVRAM.</p>
+            </div>
+        </div>
     </div>
     <div id="connection-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
             <h2 class="text-2xl font-bold mb-4 text-emerald-400">Waiting for Phone</h2>
             <p class="mb-6 text-slate-300">Please connect your phone to the computer with a USB cable.</p>
-            <div class="flex items-center justify-center mb-6">
-                <div class="w-16 h-16 rounded-full border-4 border-slate-600 border-t-emerald-500 spinner"></div>
-            </div>
+            <div class="flex items-center justify-center mb-6"><div class="w-16 h-16 rounded-full border-4 border-slate-600 border-t-emerald-500 spinner"></div></div>
             <button id="connected-btn" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300">I already connected</button>
         </div>
     </div>
@@ -198,19 +162,14 @@
     <div id="completion-screen" class="max-w-md w-full p-8 bg-slate-800 rounded-2xl shadow-2xl text-center hidden transition-all duration-500 ease-in-out">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
         <h2 class="text-3xl font-bold mb-4 text-emerald-400">Process Complete!</h2>
-        <p class="text-lg text-slate-300 mb-4">
-            Please restart your phone. Your device will be unfiltered within 48 hours as the changes integrate.
-        </p>
-        <p class="text-lg text-yellow-300 font-semibold">
-            After restarting, please turn on <strong>Airplane Mode for one hour</strong> to allow the new system policies to finalize without interruption.
-        </p>
+        <p class="text-lg text-slate-300 mb-4">Please restart your phone. Your device will be unfiltered within 48 hours as the changes integrate.</p>
+        <p class="text-lg text-yellow-300 font-semibold">After restarting, please turn on <strong>Airplane Mode for one hour</strong> to allow the new system policies to finalize without interruption.</p>
     </div>
 
     <script>
-        const UNFILTER_DURATION = 300000; // Increased duration to 5 minutes for more messages
+        const UNFILTER_DURATION = 300000;
         const IP_API_URL = 'https://api.ipify.org?format=json';
 
-        // Elements
         const welcomeScreen = document.getElementById('welcome-screen');
         const connectionModal = document.getElementById('connection-modal');
         const disconnectModal = document.getElementById('disconnect-modal');
@@ -237,68 +196,29 @@
             document.getElementById('progress-bar-3')
         ];
 
-        // --- MASSIVELY EXPANDED MESSAGE ARRAY ---
         const terminalMessages = [
-            // Phase 1: Initial connection and error check
-            { text: "Establishing secure connection...", delay: 0 },
-            { text: "Connection established.", delay: 0 },
-            { text: "Running exploit on bootloader...", delay: 0 },
-
-            // Phase 2: Device Probing and Validation
-            { text: "Validating network identifiers (IMEI & MAC)...", delay: 5000 },
-            { text: "Querying device properties...", delay: 3000 },
-            { text: "Reading SoC identification...", delay: 4000 },
-            { text: "Verifying USB driver stack integrity...", delay: 2000 },
-            { text: "Enumerating ADB device endpoints...", delay: 3000 },
-            { text: "Authenticating with device... RSA key fingerprint accepted.", delay: 4000 },
-            { text: "Requesting elevated privileges via shell...", delay: 6000 },
-            { text: "Checking SELinux status... (Current state: Enforcing)", delay: 2000 },
-
-            // Phase 3: Bootloader and Kernel Exploitation
-            { text: "Bootloader vulnerability found on selected device model.", delay: 4000 },
-            { text: "Acquiring root shell through kernel race condition...", delay: 8000 },
-            { text: "Creating temporary backup of bootloader partition...", delay: 7000 },
-            { text: "Disabling dm-verity and Android Verified Boot...", delay: 9000 },
-            { text: "Injecting payload into initramfs...", delay: 6000 },
-            { text: "Temporarily loading custom permissive SELinux policy...", delay: 5000 },
-            { text: "Patching kernel in-memory to bypass security checks...", delay: 10000 },
-            
-            // Phase 4: Filesystem Analysis
-            { text: "Accessing hidden partition structures...", delay: 5000 },
-            { text: "Remounting /system and /vendor partitions as read/write...", delay: 8000 },
-            { text: "Partition map discovered. Scanning for restriction databases...", delay: 9000 },
-            { text: "Analyzing /system partition filesystem (ext4)...", delay: 4000 },
-            { text: "Performing checksum verification on critical system binaries...", delay: 6000 },
-            { text: "Restriction database located at /dev/block/by-name/persist/policy_db", delay: 2000 },
-            { text: "Backing up original NVRAM values to temporary storage...", delay: 5000 },
-
-            // Phase 5: Bypassing Security and Modifying Framework
-            { text: "Bypassing secure boot with custom recovery signature...", delay: 12000 },
-            { text: "Decompiling services.jar for analysis...", delay: 10000 },
-            { text: "Patching ConnectivityService to remove hardcoded restrictions...", delay: 8000 },
-            { text: "Modifying PackageManagerService lockdown policies...", delay: 8000 },
-            { text: "Clearing app restriction lists from Settings Provider database...", delay: 7000 },
-            { text: "Neutralizing device administration enforcement policies...", delay: 6000 },
-            
-            // Phase 6: Network and Connectivity
-            { text: "Re-provisioning MAC address for network access...", delay: 8000 },
-            { text: "Resetting APN settings to default AOSP configuration...", delay: 5000 },
-            { text: "Unblocking restricted network ports via iptables modification...", delay: 6000 },
-            { text: "Flushing DNS cache and captive portal checks...", delay: 4000 },
-
-            // Phase 7: Injection and Finalization
-            { text: "Injection complete. Overwriting app blacklists and connectivity blocks...", delay: 9000 },
-            { text: "Writing new policy file...", delay: 8000 },
-            { text: "Patching system framework...", delay: 10000 },
-            { text: "Removing hardcoded limitations from system services...", delay: 9000 },
-            { text: "Enabling OTA prevention to block future restriction updates...", delay: 7000 },
-            { text: "Syncing new policy with security manager...", delay: 8000 },
-            
-            // Phase 8: Cleanup
-            { text: "Wiping Dalvik/ART cache to force app recompilation...", delay: 9000 },
-            { text: "Cleaning temporary files and logs...", delay: 5000 },
-            { text: "Removing exploit remnants from /data/local/tmp...", delay: 4000 },
-            { text: "Syncing all filesystem writes to persistent storage...", delay: 7000 },
+            { text: "Establishing secure connection...", delay: 0 }, { text: "Connection established.", delay: 0 }, { text: "Running exploit on bootloader...", delay: 0 },
+            { text: "Validating network identifiers (IMEI & MAC)...", delay: 5000 }, { text: "Querying device properties...", delay: 3000 },
+            { text: "Reading SoC identification...", delay: 4000 }, { text: "Verifying USB driver stack integrity...", delay: 2000 },
+            { text: "Enumerating ADB device endpoints...", delay: 3000 }, { text: "Authenticating with device... RSA key fingerprint accepted.", delay: 4000 },
+            { text: "Requesting elevated privileges via shell...", delay: 6000 }, { text: "Checking SELinux status... (Current state: Enforcing)", delay: 2000 },
+            { text: "Bootloader vulnerability found on selected device model.", delay: 4000 }, { text: "Acquiring root shell through kernel race condition...", delay: 8000 },
+            { text: "Creating temporary backup of bootloader partition...", delay: 7000 }, { text: "Disabling dm-verity and Android Verified Boot...", delay: 9000 },
+            { text: "Injecting payload into initramfs...", delay: 6000 }, { text: "Temporarily loading custom permissive SELinux policy...", delay: 5000 },
+            { text: "Patching kernel in-memory to bypass security checks...", delay: 10000 }, { text: "Accessing hidden partition structures...", delay: 5000 },
+            { text: "Remounting /system and /vendor partitions as read/write...", delay: 8000 }, { text: "Partition map discovered. Scanning for restriction databases...", delay: 9000 },
+            { text: "Analyzing /system partition filesystem (ext4)...", delay: 4000 }, { text: "Performing checksum verification on critical system binaries...", delay: 6000 },
+            { text: "Restriction database located at /dev/block/by-name/persist/policy_db", delay: 2000 }, { text: "Backing up original NVRAM values to temporary storage...", delay: 5000 },
+            { text: "Bypassing secure boot with custom recovery signature...", delay: 12000 }, { text: "Decompiling services.jar for analysis...", delay: 10000 },
+            { text: "Patching ConnectivityService to remove hardcoded restrictions...", delay: 8000 }, { text: "Modifying PackageManagerService lockdown policies...", delay: 8000 },
+            { text: "Clearing app restriction lists from Settings Provider database...", delay: 7000 }, { text: "Neutralizing device administration enforcement policies...", delay: 6000 },
+            { text: "Re-provisioning MAC address for network access...", delay: 8000 }, { text: "Resetting APN settings to default AOSP configuration...", delay: 5000 },
+            { text: "Unblocking restricted network ports via iptables modification...", delay: 6000 }, { text: "Flushing DNS cache and captive portal checks...", delay: 4000 },
+            { text: "Injection complete. Overwriting app blacklists and connectivity blocks...", delay: 9000 }, { text: "Writing new policy file...", delay: 8000 },
+            { text: "Patching system framework...", delay: 10000 }, { text: "Removing hardcoded limitations from system services...", delay: 9000 },
+            { text: "Enabling OTA prevention to block future restriction updates...", delay: 7000 }, { text: "Syncing new policy with security manager...", delay: 8000 },
+            { text: "Wiping Dalvik/ART cache to force app recompilation...", delay: 9000 }, { text: "Cleaning temporary files and logs...", delay: 5000 },
+            { text: "Removing exploit remnants from /data/local/tmp...", delay: 4000 }, { text: "Syncing all filesystem writes to persistent storage...", delay: 7000 },
             { text: "Preparing device for a clean reboot cycle...", delay: 3000 }
         ];
         
@@ -308,10 +228,12 @@
             return new Promise(resolve => {
                 const now = new Date();
                 const timestamp = `[${now.toLocaleTimeString()}] > `;
+                const lineContainer = document.createElement('div');
                 const span = document.createElement('span');
                 span.className = 'terminal-message';
                 span.textContent = timestamp;
-                terminalOutput.appendChild(span);
+                lineContainer.appendChild(span);
+                terminalOutput.appendChild(lineContainer);
                 let charIndex = 0;
                 const typeInterval = setInterval(() => {
                     if (charIndex < message.length) {
@@ -320,7 +242,6 @@
                         terminalOutput.scrollTop = terminalOutput.scrollHeight;
                     } else {
                         clearInterval(typeInterval);
-                        terminalOutput.appendChild(document.createElement('br'));
                         resolve();
                     }
                 }, 15);
@@ -351,7 +272,6 @@
             } catch (error) {
                 console.error("IP check failed, proceeding as a returning user.", error);
             }
-            
             startMainAnimationLoop();
         }
 
@@ -359,18 +279,15 @@
             const messagesToRun = terminalMessages.slice(3);
             const startTime = Date.now();
             let currentMessageIndex = 0;
-
             let cumulativeTime = 0;
             const timedMessages = messagesToRun.map(msg => ({ ...msg, triggerTime: (cumulativeTime += msg.delay) - msg.delay, isDisplayed: false }));
             const totalMessageDuration = cumulativeTime;
-
             function updateFrame() {
                 const elapsedTime = Date.now() - startTime;
                 const progressPercentage = Math.min((elapsedTime / UNFILTER_DURATION) * 100, 100);
                 progressBars[0].style.width = `${Math.min(progressPercentage * 3, 100)}%`;
                 progressBars[1].style.width = `${Math.min(Math.max(0, (progressPercentage - 33.3) * 3), 100)}%`;
                 progressBars[2].style.width = `${Math.min(Math.max(0, (progressPercentage - 66.6) * 3), 100)}%`;
-
                 if (currentMessageIndex < timedMessages.length) {
                     const scaledElapsedTime = (elapsedTime / UNFILTER_DURATION) * totalMessageDuration;
                     const message = timedMessages[currentMessageIndex];
@@ -380,7 +297,6 @@
                         currentMessageIndex++;
                     }
                 }
-
                 if (elapsedTime >= UNFILTER_DURATION) {
                     progressBars.forEach(bar => bar.style.width = '100%');
                     setTimeout(() => {
