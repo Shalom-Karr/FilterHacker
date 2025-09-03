@@ -135,7 +135,7 @@
 
     <!-- Modals -->
     <div id="how-it-works-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
-        <!-- Modal content -->
+        <!-- Modal content from previous versions -->
     </div>
     <div id="connection-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
@@ -189,29 +189,25 @@
         </div>
         <div class="flex items-center justify-center mb-6"><div class="w-16 h-16 rounded-full border-4 border-slate-600 border-t-emerald-500 spinner"></div></div>
         <div class="space-y-4 mb-8">
-            <div class="space-y-2">
-                <p class="text-sm font-semibold text-slate-400">Accessing Device Partition...</p>
-                <div class="progress-bar-container"><div id="progress-bar-1" class="progress-bar" style="width: 0%;"></div></div>
-            </div>
-            <div class="space-y-2">
-                <p class="text-sm font-semibold text-slate-400">Patching System Framework...</p>
-                <div class="progress-bar-container"><div id="progress-bar-2" class="progress-bar" style="width: 0%;"></div></div>
-            </div>
-            <div class="space-y-2">
-                <p class="text-sm font-semibold text-slate-400">Modifying Restriction Database...</p>
-                <div class="progress-bar-container"><div id="progress-bar-3" class="progress-bar" style="width: 0%;"></div></div>
-            </div>
+            <div class="space-y-2"><p class="text-sm font-semibold text-slate-400">Accessing Device Partition...</p><div class="progress-bar-container"><div id="progress-bar-1" class="progress-bar" style="width: 0%;"></div></div></div>
+            <div class="space-y-2"><p class="text-sm font-semibold text-slate-400">Patching System Framework...</p><div class="progress-bar-container"><div id="progress-bar-2" class="progress-bar" style="width: 0%;"></div></div></div>
+            <div class="space-y-2"><p class="text-sm font-semibold text-slate-400">Modifying Restriction Database...</p><div class="progress-bar-container"><div id="progress-bar-3" class="progress-bar" style="width: 0%;"></div></div></div>
         </div>
         <div class="terminal"><div id="terminal-output"></div><span class="text-emerald-400 animate-pulse terminal-cursor">&#9608;</span></div>
     </div>
     <div id="completion-screen" class="max-w-md w-full p-8 bg-slate-800 rounded-2xl shadow-2xl text-center hidden transition-all duration-500 ease-in-out">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
         <h2 class="text-3xl font-bold mb-4 text-emerald-400">Process Complete!</h2>
-        <p class="text-lg text-slate-300">Please restart your phone. Your device will be unfiltered within 48 hours as the changes integrate with the system cache.</p>
+        <p class="text-lg text-slate-300 mb-4">
+            Please restart your phone. Your device will be unfiltered within 48 hours as the changes integrate.
+        </p>
+        <p class="text-lg text-yellow-300 font-semibold">
+            After restarting, please turn on <strong>Airplane Mode for one hour</strong> to allow the new system policies to finalize without interruption.
+        </p>
     </div>
 
     <script>
-        const UNFILTER_DURATION = 240000; // Total duration in milliseconds (4 minutes)
+        const UNFILTER_DURATION = 240000;
         const IP_API_URL = 'https://api.ipify.org?format=json';
 
         // Elements
@@ -241,6 +237,7 @@
             document.getElementById('progress-bar-3')
         ];
 
+        // --- REVERTED MESSAGE ARRAY ---
         const terminalMessages = [
             { text: "Establishing secure connection...", delay: 0 },
             { text: "Connection established.", delay: 0 },
@@ -262,7 +259,6 @@
             { text: "Unfiltering process completed successfully. Finalizing changes.", delay: 8000 },
         ];
         
-        // Helper function to create a pause
         const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
         function simulateTyping(message) {
@@ -282,77 +278,62 @@
                     } else {
                         clearInterval(typeInterval);
                         terminalOutput.appendChild(document.createElement('br'));
-                        resolve(); // Resolve promise when typing is done
+                        resolve();
                     }
                 }, 15);
             });
         }
         
         async function runProcess() {
-            // Display the initial three messages with pauses.
             await simulateTyping(terminalMessages[0].text);
-            await wait(1500); // Wait 1.5 seconds
-
+            await wait(1500);
             await simulateTyping(terminalMessages[1].text);
-            await wait(2000); // Wait 2 seconds
-            
+            await wait(2000);
             await simulateTyping(terminalMessages[2].text);
-            await wait(500); // Short pause for drama
+            await wait(500);
 
-            // After the third message, perform the IP check.
             try {
                 const response = await fetch(IP_API_URL);
                 if (!response.ok) throw new Error('IP API failed');
                 const data = await response.json();
                 const userIp = data.ip;
                 let seenIPs = JSON.parse(localStorage.getItem('seenIPs')) || [];
-
                 if (!seenIPs.includes(userIp)) {
-                    // This is a new IP. Show the "disconnect" error.
                     seenIPs.push(userIp);
                     localStorage.setItem('seenIPs', JSON.stringify(seenIPs));
-                    
                     processingScreen.classList.add('hidden');
                     disconnectModal.classList.remove('hidden');
-                    return; // Stop the process.
+                    return;
                 }
             } catch (error) {
                 console.error("IP check failed, proceeding as a returning user.", error);
             }
             
-            // If the IP was found (or check failed), start the main animation loop.
             startMainAnimationLoop();
         }
 
         function startMainAnimationLoop() {
-            const messagesToRun = terminalMessages.slice(3); // The rest of the messages
+            const messagesToRun = terminalMessages.slice(3);
             const startTime = Date.now();
             let currentMessageIndex = 0;
 
             let cumulativeTime = 0;
-            const timedMessages = messagesToRun.map(msg => {
-                const trigger = cumulativeTime;
-                cumulativeTime += msg.delay;
-                return { ...msg, triggerTime: trigger, isDisplayed: false };
-            });
+            const timedMessages = messagesToRun.map(msg => ({ ...msg, triggerTime: (cumulativeTime += msg.delay) - msg.delay, isDisplayed: false }));
             const totalMessageDuration = cumulativeTime;
 
             function updateFrame() {
                 const elapsedTime = Date.now() - startTime;
                 const progressPercentage = Math.min((elapsedTime / UNFILTER_DURATION) * 100, 100);
-                const p1 = Math.min(progressPercentage * 3, 100);
-                const p2 = Math.min(Math.max(0, (progressPercentage - 33.3) * 3), 100);
-                const p3 = Math.min(Math.max(0, (progressPercentage - 66.6) * 3), 100);
-                progressBars[0].style.width = `${p1}%`;
-                progressBars[1].style.width = `${p2}%`;
-                progressBars[2].style.width = `${p3}%`;
+                progressBars[0].style.width = `${Math.min(progressPercentage * 3, 100)}%`;
+                progressBars[1].style.width = `${Math.min(Math.max(0, (progressPercentage - 33.3) * 3), 100)}%`;
+                progressBars[2].style.width = `${Math.min(Math.max(0, (progressPercentage - 66.6) * 3), 100)}%`;
 
                 if (currentMessageIndex < timedMessages.length) {
                     const scaledElapsedTime = (elapsedTime / UNFILTER_DURATION) * totalMessageDuration;
                     const message = timedMessages[currentMessageIndex];
                     if (scaledElapsedTime >= message.triggerTime && !message.isDisplayed) {
                         message.isDisplayed = true;
-                        simulateTyping(message.text); // Fire and forget
+                        simulateTyping(message.text);
                         currentMessageIndex++;
                     }
                 }
@@ -370,7 +351,6 @@
             requestAnimationFrame(updateFrame);
         }
 
-        // --- Event Listeners ---
         function setInputState(input, errorElement, isValid) {
             const errorClasses = ['border-red-500', 'focus:ring-red-500'];
             const defaultClasses = ['border-slate-600', 'focus:ring-emerald-500'];
@@ -385,15 +365,8 @@
             }
         }
 
-        continueBtn.addEventListener('click', () => {
-            welcomeScreen.classList.add('hidden');
-            connectionModal.classList.remove('hidden');
-        });
-
-        tryAgainBtn.addEventListener('click', () => {
-            location.reload();
-        });
-
+        continueBtn.addEventListener('click', () => { welcomeScreen.classList.add('hidden'); connectionModal.classList.remove('hidden'); });
+        tryAgainBtn.addEventListener('click', () => { location.reload(); });
         connectedBtn.addEventListener('click', () => {
             connectionModal.classList.add('hidden');
             imeiScreen.classList.remove('hidden');
@@ -402,7 +375,6 @@
                 buildNumberSection.classList.remove('hidden');
             }, 1500);
         });
-
         startProcessBtn.addEventListener('click', () => {
             terminalOutput.innerHTML = '';
             progressBars.forEach(bar => bar.style.width = '0%');
@@ -413,19 +385,12 @@
             const isMacValid = macRegex.test(macValue);
             setInputState(imeiInput, imeiError, isImeiValid);
             setInputState(macAddressInput, macError, isMacValid);
-            if (!isImeiValid) {
-                imeiInput.focus();
-                return;
-            }
-            if (!isMacValid) {
-                macAddressInput.focus();
-                return;
-            }
+            if (!isImeiValid) { imeiInput.focus(); return; }
+            if (!isMacValid) { macAddressInput.focus(); return; }
             imeiScreen.classList.add('hidden');
             processingScreen.classList.remove('hidden');
             runProcess();
         });
-
         howItWorksBtn.addEventListener('click', () => { howItWorksModal.classList.remove('hidden'); });
         closeWorksModalBtn.addEventListener('click', () => { howItWorksModal.classList.add('hidden'); });
         [howItWorksModal, connectionModal, disconnectModal].forEach(modal => {
