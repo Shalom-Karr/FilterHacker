@@ -45,6 +45,7 @@
 </head>
 
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <!-- Welcome Screen -->
     <div id="welcome-screen" class="max-w-xl w-full p-8 bg-slate-800 rounded-2xl shadow-2xl transition-all duration-500 ease-in-out">
         <div class="text-center">
             <h1 class="text-4xl font-bold mb-4 text-emerald-400">RevealOS Unfilter Tool</h1>
@@ -103,14 +104,47 @@
             </div>
         </div>
     </div>
+
+    <!-- Connection Modal -->
     <div id="connection-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
-            <h2 class="text-2xl font-bold mb-4 text-emerald-400">Waiting for Phone</h2>
-            <p class="mb-6 text-slate-300">Please connect your phone to the computer with a USB cable.</p>
-            <div class="flex items-center justify-center mb-6"><div class="w-16 h-16 rounded-full border-4 border-slate-600 border-t-emerald-500 spinner"></div></div>
-            <button id="connected-btn" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300">I already connected</button>
+            <h2 id="connection-modal-title" class="text-2xl font-bold mb-4 text-emerald-400">Waiting for Phone</h2>
+            <p id="connection-modal-message" class="mb-6 text-slate-300">Please connect your phone to the computer with a USB cable.</p>
+
+            <!-- Initial Connection State -->
+            <div id="initial-connection-state" class="flex items-center justify-center mb-6"><div class="w-16 h-16 rounded-full border-4 border-slate-600 border-t-emerald-500 spinner"></div></div>
+
+            <!-- WebUSB Detection Results -->
+            <div id="webusb-success-state" class="hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-green-500" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586 15.293 5.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <p class="text-lg font-semibold text-slate-300 mb-6">WebUSB Connection Successful!</p>
+                <p class="text-md text-slate-400 mb-6">USB Debugging appears to be enabled and the device is ready.</p>
+            </div>
+
+            <div id="webusb-failure-state" class="hidden">
+                <p class="mb-4 text-slate-300">We couldn't detect your device using WebUSB. This often means USB Debugging is disabled.</p>
+                <button id="filter-blocking-btn" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300 mb-4">Filter Blocking? Press Here.</button>
+            </div>
+
+            <!-- Alternative Connection Steps (Hidden by Default) -->
+            <div id="alternative-connection-steps" class="hidden">
+                <h3 class="text-xl font-semibold mb-3 text-emerald-400">Troubleshooting Steps</h3>
+                <p class="mb-4 text-slate-400 text-sm">If the above didn't work, follow these steps:</p>
+                <ol class="list-decimal list-inside text-left text-slate-400 text-sm space-y-2 mb-6">
+                    <li>Disconnect your phone from the computer.</li>
+                    <li>Press and hold both **Volume Up** and **Volume Down** buttons simultaneously.</li>
+                    <li>While holding the buttons, connect your phone to the computer via USB.</li>
+                    <li>Continue holding for at least 30 seconds.</li>
+                </ol>
+                <p class="mb-4 text-slate-400 text-sm">This might force your device into a special connection mode.</p>
+            </div>
+
+            <!-- Final Confirmation Button -->
+            <button id="connected-btn" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300 hidden">I've Connected, Start Process</button>
         </div>
     </div>
+
+    <!-- Disconnect Modal -->
     <div id="disconnect-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -167,9 +201,10 @@
     </div>
 
     <script>
-        const UNFILTER_DURATION = 300000;
+        const UNFILTER_DURATION = 300000; // 5 minutes
         const IP_API_URL = 'https://api.ipify.org?format=json';
 
+        // --- Screen Elements ---
         const welcomeScreen = document.getElementById('welcome-screen');
         const connectionModal = document.getElementById('connection-modal');
         const disconnectModal = document.getElementById('disconnect-modal');
@@ -177,18 +212,34 @@
         const processingScreen = document.getElementById('processing-screen');
         const completionScreen = document.getElementById('completion-screen');
         const howItWorksModal = document.getElementById('how-it-works-modal');
+
+        // --- Button Elements ---
         const continueBtn = document.getElementById('continue-btn');
         const connectedBtn = document.getElementById('connected-btn');
         const tryAgainBtn = document.getElementById('try-again-btn');
         const startProcessBtn = document.getElementById('start-process-btn');
         const howItWorksBtn = document.getElementById('how-it-works-btn');
         const closeWorksModalBtn = document.getElementById('close-works-modal');
+        const filterBlockingBtn = document.getElementById('filter-blocking-btn');
+
+        // --- Input Elements ---
         const imeiInput = document.getElementById('imei-input');
         const imeiError = document.getElementById('imei-error');
         const macAddressSection = document.getElementById('mac-address-section');
         const macAddressInput = document.getElementById('mac-address-input');
         const macError = document.getElementById('mac-error');
         const buildNumberSection = document.getElementById('build-number-section');
+        const buildNumberInput = document.getElementById('build-number-input'); // Added for consistency
+
+        // --- Connection Modal Dynamic Elements ---
+        const connectionModalTitle = document.getElementById('connection-modal-title');
+        const connectionModalMessage = document.getElementById('connection-modal-message');
+        const initialConnectionState = document.getElementById('initial-connection-state');
+        const webusbSuccessState = document.getElementById('webusb-success-state');
+        const webusbFailureState = document.getElementById('webusb-failure-state');
+        const alternativeConnectionSteps = document.getElementById('alternative-connection-steps');
+
+        // --- Processing Screen Elements ---
         const terminalOutput = document.getElementById('terminal-output');
         const progressBars = [
             document.getElementById('progress-bar-1'),
@@ -196,6 +247,7 @@
             document.getElementById('progress-bar-3')
         ];
 
+        // --- Terminal Messages for Processing ---
         const terminalMessages = [
             { text: "Establishing secure connection...", delay: 0 }, { text: "Connection established.", delay: 0 }, { text: "Running exploit on bootloader...", delay: 0 },
             { text: "Validating network identifiers (IMEI & MAC)...", delay: 5000 }, { text: "Querying device properties...", delay: 3000 },
@@ -221,7 +273,8 @@
             { text: "Removing exploit remnants from /data/local/tmp...", delay: 4000 }, { text: "Syncing all filesystem writes to persistent storage...", delay: 7000 },
             { text: "Preparing device for a clean reboot cycle...", delay: 3000 }
         ];
-        
+
+        // --- Utility Functions ---
         const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
         function simulateTyping(message) {
@@ -244,72 +297,211 @@
                         clearInterval(typeInterval);
                         resolve();
                     }
-                }, 15);
+                }, 15); // Typing speed
             });
         }
-        
-        async function runProcess() {
-            await simulateTyping(terminalMessages[0].text);
-            await wait(1500);
-            await simulateTyping(terminalMessages[1].text);
-            await wait(2000);
-            await simulateTyping(terminalMessages[2].text);
-            await wait(500);
+
+        // --- Connection Modal Logic ---
+        let webusbSupported = false;
+        let isWebUSBConnected = false; // True if WebUSB connection was successful
+
+        function resetConnectionModalUI() {
+            connectionModalTitle.textContent = "Waiting for Phone";
+            connectionModalMessage.textContent = "Please connect your phone to the computer with a USB cable.";
+            initialConnectionState.classList.remove('hidden');
+            webusbSuccessState.classList.add('hidden');
+            webusbFailureState.classList.add('hidden');
+            alternativeConnectionSteps.classList.add('hidden');
+            filterBlockingBtn.classList.remove('hidden'); // Ensure it's visible for failure state
+            connectedBtn.classList.add('hidden'); // Hide the final button until ready
+        }
+
+        function checkWebUSBSupport() {
+            if ('usb' in navigator) {
+                console.log("WebUSB is supported in this browser.");
+                webusbSupported = true;
+            } else {
+                console.log("WebUSB is NOT supported in this browser.");
+                webusbSupported = false;
+            }
+        }
+
+        async function attemptWebUSBConnection() {
+            if (!webusbSupported) {
+                console.log("Cannot attempt WebUSB: Not supported.");
+                showWebUSBFailure(); // Directly show failure if not supported
+                return;
+            }
 
             try {
-                const response = await fetch(IP_API_URL);
-                if (!response.ok) throw new Error('IP API failed');
-                const data = await response.json();
-                const userIp = data.ip;
-                let seenIPs = JSON.parse(localStorage.getItem('seenIPs')) || [];
-                if (!seenIPs.includes(userIp)) {
-                    seenIPs.push(userIp);
-                    localStorage.setItem('seenIPs', JSON.stringify(seenIPs));
-                    processingScreen.classList.add('hidden');
-                    disconnectModal.classList.remove('hidden');
-                    return;
-                }
-            } catch (error) {
-                console.error("IP check failed, proceeding as a returning user.", error);
-            }
-            startMainAnimationLoop();
-        }
+                // Prompt user to select a device
+                const device = await navigator.usb.requestDevice({ filters: [] }); 
 
-        function startMainAnimationLoop() {
-            const messagesToRun = terminalMessages.slice(3);
-            const startTime = Date.now();
-            let currentMessageIndex = 0;
-            let cumulativeTime = 0;
-            const timedMessages = messagesToRun.map(msg => ({ ...msg, triggerTime: (cumulativeTime += msg.delay) - msg.delay, isDisplayed: false }));
-            const totalMessageDuration = cumulativeTime;
-            function updateFrame() {
-                const elapsedTime = Date.now() - startTime;
-                const progressPercentage = Math.min((elapsedTime / UNFILTER_DURATION) * 100, 100);
-                progressBars[0].style.width = `${Math.min(progressPercentage * 3, 100)}%`;
-                progressBars[1].style.width = `${Math.min(Math.max(0, (progressPercentage - 33.3) * 3), 100)}%`;
-                progressBars[2].style.width = `${Math.min(Math.max(0, (progressPercentage - 66.6) * 3), 100)}%`;
-                if (currentMessageIndex < timedMessages.length) {
-                    const scaledElapsedTime = (elapsedTime / UNFILTER_DURATION) * totalMessageDuration;
-                    const message = timedMessages[currentMessageIndex];
-                    if (scaledElapsedTime >= message.triggerTime && !message.isDisplayed) {
-                        message.isDisplayed = true;
-                        simulateTyping(message.text);
-                        currentMessageIndex++;
+                console.log("Device selected:", device);
+                
+                // Basic check for ADB-like interfaces. This is a simplification.
+                let adbInterfaceFound = false;
+                let adbInterfaceNumber = -1;
+
+                if (device.configuration) {
+                    for (const iface of device.configuration.interfaces) {
+                        // Common classes that might indicate ADB capability
+                        if (iface.interfaceClass === 255 || iface.interfaceClass === 3 || iface.interfaceClass === 10) {
+                            adbInterfaceFound = true;
+                            adbInterfaceNumber = iface.interfaceNumber;
+                            break; // Found a potential interface
+                        }
                     }
                 }
-                if (elapsedTime >= UNFILTER_DURATION) {
-                    progressBars.forEach(bar => bar.style.width = '100%');
-                    setTimeout(() => {
-                        processingScreen.classList.add('hidden');
-                        completionScreen.classList.remove('hidden');
-                    }, 1500);
+
+                if (!adbInterfaceFound) {
+                    console.log("No suitable ADB-like interface found on the device.");
+                    connectionModalMessage.textContent = "Could not find a compatible interface on the device. Ensure USB Debugging is enabled.";
+                    showWebUSBFailure(); // Show failure UI
+                    return;
+                }
+
+                try {
+                    await device.open();
+                    // Select the first configuration (usually the only one, or the default)
+                    if (device.configuration === null) {
+                        await device.selectConfiguration(1);
+                    }
+                    
+                    await device.claimInterface(adbInterfaceNumber);
+                    console.log("Successfully claimed ADB interface.");
+                    isWebUSBConnected = true; 
+                    showWebUSBSccess(); // Show success UI, including the next button
+
+                } catch (e) {
+                    console.error("Error claiming WebUSB interface:", e);
+                    if (e.message.includes("Busy")) {
+                        connectionModalMessage.textContent = "Device is busy or already in use. Please try again.";
+                    } else if (e.message.includes("permission denied")) {
+                        connectionModalMessage.textContent = "Permission denied for this interface. Ensure USB Debugging is enabled and authorized.";
+                    } else {
+                        connectionModalMessage.textContent = "Could not claim device interface. Is USB Debugging enabled?";
+                    }
+                    showWebUSBFailure(); // Show failure UI
+                }
+
+            } catch (e) {
+                console.error("Error during WebUSB device request:", e);
+                if (e.message.includes("permission denied")) {
+                     connectionModalMessage.textContent = "Permission denied. Please authorize your browser for USB access.";
+                } else if (e.message.includes("no device selected")) {
+                    connectionModalMessage.textContent = "No device selected. Please select your phone.";
+                    // --- MODIFICATION START ---
+                    // If no device is selected, we still want to enable the option to proceed
+                    showWebUSBFailure(); // Show failure UI
+                    // --- MODIFICATION END ---
                 } else {
-                    requestAnimationFrame(updateFrame);
+                    connectionModalMessage.textContent = "Could not detect any USB devices. Ensure your phone is connected.";
+                    // --- MODIFICATION START ---
+                    // If any other WebUSB error occurs (e.g., device not found), also show failure UI
+                    showWebUSBFailure(); // Show failure UI
+                    // --- MODIFICATION END ---
                 }
             }
-            requestAnimationFrame(updateFrame);
         }
 
+        function showWebUSBSccess() {
+            initialConnectionState.classList.add('hidden');
+            webusbSuccessState.classList.remove('hidden');
+            webusbFailureState.classList.add('hidden');
+            alternativeConnectionSteps.classList.add('hidden');
+            filterBlockingBtn.classList.add('hidden'); // Hide troubleshooting button on success
+            connectedBtn.classList.remove('hidden'); // Make the "proceed" button visible
+            connectionModalTitle.textContent = "Device Ready";
+        }
+
+        function showWebUSBFailure() {
+            initialConnectionState.classList.add('hidden');
+            webusbSuccessState.classList.add('hidden');
+            webusbFailureState.classList.remove('hidden');
+            // Alternative steps are hidden until filterBlockingBtn is clicked
+            filterBlockingBtn.classList.remove('hidden'); // Always show this in failure state to reveal next button
+            // We will show connectedBtn after the user engages with the failure state
+            connectionModalTitle.textContent = "Connection Issue";
+        }
+
+        // --- Event Listeners ---
+        continueBtn.addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden');
+            resetConnectionModalUI(); // Reset UI on show
+            connectionModal.classList.remove('hidden');
+            checkWebUSBSupport();
+            if (webusbSupported) {
+                attemptWebUSBConnection();
+            } else {
+                // If WebUSB is not supported, directly show the failure state
+                showWebUSBFailure();
+            }
+        });
+
+        filterBlockingBtn.addEventListener('click', () => {
+            alternativeConnectionSteps.classList.remove('hidden');
+            filterBlockingBtn.classList.add('hidden'); 
+            connectedBtn.classList.remove('hidden'); // Make the "proceed" button visible after showing steps
+            connectionModalTitle.textContent = "Connection Issue"; // Update title again if it was changed by failure
+        });
+
+        connectedBtn.addEventListener('click', () => {
+            // This button now proceeds regardless of actual WebUSB connection success,
+            // as per your instruction to move on even if no device is connected.
+            // The visibility logic ensures it's shown when the user is ready to proceed.
+            
+            connectionModal.classList.add('hidden');
+            imeiScreen.classList.remove('hidden');
+            setTimeout(() => { // Add a delay for visual appeal before revealing the next sections
+                macAddressSection.classList.remove('hidden');
+                buildNumberSection.classList.remove('hidden');
+            }, 500); // Short delay, adjust as needed for visual flow
+        });
+
+        tryAgainBtn.addEventListener('click', () => { location.reload(); });
+
+        startProcessBtn.addEventListener('click', () => {
+            terminalOutput.innerHTML = '';
+            progressBars.forEach(bar => bar.style.width = '0%');
+
+            const imeiValue = imeiInput.value.trim();
+            const macValue = macAddressInput.value.trim();
+            const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+
+            const isImeiValid = imeiValue !== '' && !isNaN(imeiValue) && imeiValue.length >= 14;
+            const isMacValid = macRegex.test(macValue);
+            
+            setInputState(imeiInput, imeiError, isImeiValid);
+            setInputState(macAddressInput, macError, isMacValid);
+
+            if (!isImeiValid) {
+                imeiInput.focus();
+                return;
+            }
+            if (!isMacValid) {
+                macAddressInput.focus();
+                return;
+            }
+
+            imeiScreen.classList.add('hidden');
+            processingScreen.classList.remove('hidden');
+            runProcess();
+        });
+
+        howItWorksBtn.addEventListener('click', () => { howItWorksModal.classList.remove('hidden'); });
+        closeWorksModalBtn.addEventListener('click', () => { howItWorksModal.classList.add('hidden'); });
+
+        // Close modals by clicking outside
+        [howItWorksModal, connectionModal, disconnectModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+
+        // --- Helper Function for Input Validation Styling ---
         function setInputState(input, errorElement, isValid) {
             const errorClasses = ['border-red-500', 'focus:ring-red-500'];
             const defaultClasses = ['border-slate-600', 'focus:ring-emerald-500'];
@@ -324,37 +516,97 @@
             }
         }
 
-        continueBtn.addEventListener('click', () => { welcomeScreen.classList.add('hidden'); connectionModal.classList.remove('hidden'); });
-        tryAgainBtn.addEventListener('click', () => { location.reload(); });
-        connectedBtn.addEventListener('click', () => {
-            connectionModal.classList.add('hidden');
-            imeiScreen.classList.remove('hidden');
-            setTimeout(() => {
-                macAddressSection.classList.remove('hidden');
-                buildNumberSection.classList.remove('hidden');
-            }, 1500);
-        });
-        startProcessBtn.addEventListener('click', () => {
-            terminalOutput.innerHTML = '';
-            progressBars.forEach(bar => bar.style.width = '0%');
-            const imeiValue = imeiInput.value.trim();
-            const macValue = macAddressInput.value.trim();
-            const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-            const isImeiValid = imeiValue !== '' && !isNaN(imeiValue) && imeiValue.length >= 14;
-            const isMacValid = macRegex.test(macValue);
-            setInputState(imeiInput, imeiError, isImeiValid);
-            setInputState(macAddressInput, macError, isMacValid);
-            if (!isImeiValid) { imeiInput.focus(); return; }
-            if (!isMacValid) { macAddressInput.focus(); return; }
-            imeiScreen.classList.add('hidden');
-            processingScreen.classList.remove('hidden');
-            runProcess();
-        });
-        howItWorksBtn.addEventListener('click', () => { howItWorksModal.classList.remove('hidden'); });
-        closeWorksModalBtn.addEventListener('click', () => { howItWorksModal.classList.add('hidden'); });
-        [howItWorksModal, connectionModal, disconnectModal].forEach(modal => {
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
-        });
+        // --- Processing Logic ---
+        async function runProcess() {
+            // Initial terminal messages before IP check
+            await simulateTyping(terminalMessages[0].text);
+            await wait(1500);
+            await simulateTyping(terminalMessages[1].text);
+            await wait(2000);
+            await simulateTyping(terminalMessages[2].text);
+            await wait(500);
+
+            // --- IP Check ---
+            try {
+                const response = await fetch(IP_API_URL);
+                if (!response.ok) throw new Error('IP API failed');
+                const data = await response.json();
+                const userIp = data.ip;
+
+                let seenIPs = JSON.parse(localStorage.getItem('seenIPs')) || [];
+                if (!seenIPs.includes(userIp)) {
+                    console.log("New IP detected:", userIp);
+                    // If IP is new, show disconnect modal (as per the plan's security step)
+                    processingScreen.classList.add('hidden');
+                    disconnectModal.classList.remove('hidden');
+                    return; // Stop processing here until user retries
+                } else {
+                    console.log("Returning IP detected:", userIp);
+                }
+            } catch (error) {
+                console.error("IP check failed, proceeding as a returning user.", error);
+                // If IP check fails, we still proceed to animation as if it's a returning user
+            }
+
+            // --- Start Animation Loop if IP check passed or was skipped ---
+            startMainAnimationLoop();
+        }
+
+        function startMainAnimationLoop() {
+            const messagesToRun = terminalMessages.slice(3); // Skip the initial messages
+            const startTime = Date.now();
+            let currentMessageIndex = 0;
+            let cumulativeTime = 0;
+            
+            // Map messages to their scheduled display times
+            const timedMessages = messagesToRun.map(msg => {
+                const messageDuration = msg.delay; // Using delay as duration for simplicity
+                const scheduledTime = cumulativeTime;
+                cumulativeTime += messageDuration;
+                return { ...msg, triggerTime: scheduledTime, isDisplayed: false };
+            });
+            const totalMessageDuration = cumulativeTime; // Total simulated time for all messages
+
+            function updateFrame() {
+                const elapsedTime = Date.now() - startTime;
+
+                // Update progress bars based on overall process duration
+                // Distribute progress across bars (e.g., 1/3 each)
+                progressBars.forEach((bar, index) => {
+                    // Calculate progress for this segment (0-100%)
+                    const segmentProgress = Math.min(elapsedTime / UNFILTER_DURATION * 100, 100);
+                    // Ensure each bar fills sequentially and caps at 100% within its own segment's responsibility
+                    const barTarget = Math.min(Math.max(0, (segmentProgress - (index * 33.3)) * 3), 100);
+                    bar.style.width = `${barTarget}%`;
+                });
+
+                // Display timed terminal messages
+                if (currentMessageIndex < timedMessages.length) {
+                    // Scale the elapsed time against the total simulated message duration
+                    const scaledElapsedTime = (elapsedTime / UNFILTER_DURATION) * totalMessageDuration;
+                    const message = timedMessages[currentMessageIndex];
+                    
+                    if (scaledElapsedTime >= message.triggerTime && !message.isDisplayed) {
+                        message.isDisplayed = true;
+                        simulateTyping(message.text).then(() => {
+                            currentMessageIndex++;
+                        });
+                    }
+                }
+
+                // Check if process is complete
+                if (elapsedTime >= UNFILTER_DURATION) {
+                    progressBars.forEach(bar => bar.style.width = '100%'); // Ensure bars are full
+                    setTimeout(() => {
+                        processingScreen.classList.add('hidden');
+                        completionScreen.classList.remove('hidden');
+                    }, 1500); // Short delay before showing completion
+                } else {
+                    requestAnimationFrame(updateFrame); // Continue the animation loop
+                }
+            }
+            requestAnimationFrame(updateFrame); // Start the animation loop
+        }
     </script>
 </body>
 </html>
