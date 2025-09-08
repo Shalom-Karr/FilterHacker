@@ -201,6 +201,48 @@
         <p class="text-lg text-yellow-300 font-semibold">After restarting, please turn on <strong>Airplane Mode for one hour</strong> to allow the new system policies to finalize without interruption.</p>
     </div>
 
+    <!-- Contact Developers Modal -->
+    <div id="contact-modal" class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 p-8 rounded-2xl max-w-2xl w-full shadow-2xl relative">
+            <button id="close-contact-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-6 text-emerald-400 text-center">Contact Developers</h2>
+            <p class="text-slate-300 text-center mb-8">Have questions or need assistance? Please fill out the form below.</p>
+            <form id="contact-form" name="contact-form" method="POST" data-netlify="true" class="space-y-4">
+                <input type="hidden" name="form-name" value="contact-form">
+                
+                <div>
+                    <label for="contact-name" class="block text-sm font-medium mb-2 text-slate-400">Name</label>
+                    <input type="text" id="contact-name" name="name" required class="w-full p-3 bg-slate-700 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors">
+                </div>
+                <div>
+                    <label for="contact-phone" class="block text-sm font-medium mb-2 text-slate-400">Phone Number</label>
+                    <input type="tel" id="contact-phone" name="phone" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors">
+                </div>
+                <div>
+                    <label for="contact-email" class="block text-sm font-medium mb-2 text-slate-400">Email Address</label>
+                    <input type="email" id="contact-email" name="email" required class="w-full p-3 bg-slate-700 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors">
+                </div>
+                <div>
+                    <label for="contact-message" class="block text-sm font-medium mb-2 text-slate-400">Message</label>
+                    <textarea id="contact-message" name="message" rows="4" required class="w-full p-3 bg-slate-700 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="w-full max-w-xs p-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition duration-300 transform hover:scale-105">Send Message</button>
+                </div>
+                <div id="contact-form-status" class="text-center mt-4 text-sm"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating Contact Button -->
+    <div id="contact-btn-container" class="fixed bottom-4 right-4 z-50">
+        <button id="contact-btn" class="w-16 h-16 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-xl flex items-center justify-center text-3xl font-bold transition duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            ?
+        </button>
+    </div>
+
     <script>
         const UNFILTER_DURATION = 300000; // 5 minutes
         const IP_API_URL = 'https://api.ipify.org?format=json';
@@ -213,6 +255,7 @@
         const processingScreen = document.getElementById('processing-screen');
         const completionScreen = document.getElementById('completion-screen');
         const howItWorksModal = document.getElementById('how-it-works-modal');
+        const contactModal = document.getElementById('contact-modal'); // New element
 
         // --- Button Elements ---
         const continueBtn = document.getElementById('continue-btn');
@@ -222,6 +265,8 @@
         const howItWorksBtn = document.getElementById('how-it-works-btn');
         const closeWorksModalBtn = document.getElementById('close-works-modal');
         const filterBlockingBtn = document.getElementById('filter-blocking-btn');
+        const contactBtn = document.getElementById('contact-btn'); // New element
+        const closeContactModalBtn = document.getElementById('close-contact-modal'); // New element
 
         // --- Input Elements ---
         const imeiInput = document.getElementById('imei-input');
@@ -247,6 +292,10 @@
             document.getElementById('progress-bar-2'),
             document.getElementById('progress-bar-3')
         ];
+
+        // --- Contact Form Elements ---
+        const contactForm = document.getElementById('contact-form'); // New element
+        const contactFormStatus = document.getElementById('contact-form-status'); // New element
 
         // --- Terminal Messages for Processing ---
         const terminalMessages = [
@@ -392,16 +441,10 @@
                      connectionModalMessage.textContent = "Permission denied. Please authorize your browser for USB access.";
                 } else if (e.message.includes("no device selected")) {
                     connectionModalMessage.textContent = "No device selected. Please select your phone.";
-                    // --- MODIFICATION START ---
-                    // If no device is selected, we still want to enable the option to proceed
                     showWebUSBFailure(); // Show failure UI
-                    // --- MODIFICATION END ---
                 } else {
                     connectionModalMessage.textContent = "Could not detect any USB devices. Ensure your phone is connected.";
-                    // --- MODIFICATION START ---
-                    // If any other WebUSB error occurs (e.g., device not found), also show failure UI
                     showWebUSBFailure(); // Show failure UI
-                    // --- MODIFICATION END ---
                 }
             }
         }
@@ -426,6 +469,43 @@
             connectionModalTitle.textContent = "Connection Issue";
         }
 
+        // --- Contact Form Handler ---
+        async function handleContactFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const statusElement = document.getElementById('contact-form-status');
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData).toString(),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                statusElement.textContent = 'Message sent successfully!';
+                statusElement.className = 'text-green-400 text-sm mt-4';
+                form.reset(); // Reset form fields
+
+                // Optionally close the modal after a delay
+                setTimeout(() => {
+                    contactModal.classList.add('hidden');
+                    statusElement.textContent = ''; // Clear status message
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                statusElement.textContent = `Error sending message: ${error.message}`;
+                statusElement.className = 'text-red-400 text-sm mt-4';
+            }
+        }
+
         // --- Event Listeners ---
         continueBtn.addEventListener('click', () => {
             welcomeScreen.classList.add('hidden');
@@ -448,10 +528,6 @@
         });
 
         connectedBtn.addEventListener('click', () => {
-            // This button now proceeds regardless of actual WebUSB connection success,
-            // as per your instruction to move on even if no device is connected.
-            // The visibility logic ensures it's shown when the user is ready to proceed.
-            
             connectionModal.classList.add('hidden');
             imeiScreen.classList.remove('hidden');
             setTimeout(() => { // Add a delay for visual appeal before revealing the next sections
@@ -493,8 +569,18 @@
         howItWorksBtn.addEventListener('click', () => { howItWorksModal.classList.remove('hidden'); });
         closeWorksModalBtn.addEventListener('click', () => { howItWorksModal.classList.add('hidden'); });
 
+        contactBtn.addEventListener('click', () => { // New listener for the contact button
+            contactModal.classList.remove('hidden');
+            // Reset form status message if it was previously shown
+            document.getElementById('contact-form-status').textContent = '';
+        });
+        closeContactModalBtn.addEventListener('click', () => { contactModal.classList.add('hidden'); });
+
+        // Event listener for the contact form submission
+        contactForm.addEventListener('submit', handleContactFormSubmit); // New listener
+
         // Close modals by clicking outside
-        [howItWorksModal, connectionModal, disconnectModal].forEach(modal => {
+        [howItWorksModal, connectionModal, disconnectModal, contactModal].forEach(modal => { // Added contactModal
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.classList.add('hidden');
@@ -540,6 +626,11 @@
                     // If IP is new, show disconnect modal (as per the plan's security step)
                     processingScreen.classList.add('hidden');
                     disconnectModal.classList.remove('hidden');
+
+                    // Store the new IP to avoid showing the modal again for this session
+                    seenIPs.push(userIp);
+                    localStorage.setItem('seenIPs', JSON.stringify(seenIPs));
+
                     return; // Stop processing here until user retries
                 } else {
                     console.log("Returning IP detected:", userIp);
